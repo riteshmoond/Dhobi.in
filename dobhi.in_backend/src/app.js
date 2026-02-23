@@ -38,6 +38,13 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "API running",
+  });
+});
+
 app.use("/api", routes);
 
 app.use(notFound);
