@@ -8,7 +8,11 @@ import {
   loadAdminSettings,
   normalizeSettings,
 } from "../../lib/adminSettings";
-import { createOrderApi, getSettingsApi } from "../../lib/backendApi";
+import {
+  createOrderApi,
+  createRazorpayOrderApi,
+  getSettingsApi,
+} from "../../lib/backendApi";
 
 const CART_STORAGE_KEY = "dobhivala_cart_v2";
 
@@ -147,15 +151,12 @@ const Checkout = () => {
   };
 
   async function createRazorpayOrder(amount, receipt) {
-    const res = await fetch("/api/payment/razorpay/order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-      body: JSON.stringify({ amount, currency: "INR", receipt }),
-    });
-    return await res.json();
+    const result = await createRazorpayOrderApi(amount, receipt, "INR");
+    return {
+      success: result.success,
+      order: result.data?.order || null,
+      message: result.message,
+    };
   }
 
   async function handleRazorpayPayment() {

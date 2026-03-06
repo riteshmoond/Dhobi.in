@@ -191,10 +191,11 @@ const Contact = () => {
 
           <iframe
             title="DhobiWala Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.522169715477!2d75.818525!3d26.862154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db66ea3b453a1%3A0xf0ece4f0a3b8573e!2sJaipur%2C%20Rajasthan"
+            src="https://www.google.com/maps?q=Jaipur%2C%20Rajasthan&output=embed"
             className="w-full h-72 rounded-2xl border shadow"
             allowFullScreen=""
             loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
           ></iframe>
         </div>
       </div>

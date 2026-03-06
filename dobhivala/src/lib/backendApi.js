@@ -127,6 +127,13 @@ export const createContactApi = (payload) =>
     body: payload,
   });
 
+export const createRazorpayOrderApi = (amount, receipt, currency = "INR") =>
+  apiFetch("/payment/razorpay/order", {
+    method: "POST",
+    token: getToken(),
+    body: { amount, currency, receipt },
+  });
+
 export const getAdminContactsApi = () =>
   apiFetch("/contact", {
     token: getToken(),
