@@ -13,13 +13,23 @@ const app = express();
 app.use(securityHeaders);
 app.use(globalLimiter);
 
+const normalizeOrigin = (value) => String(value || "").trim().replace(/\/+$/, "");
+const parseOrigins = (value) =>
+  String(value || "")
+    .split(",")
+    .map((item) => normalizeOrigin(item))
+    .filter(Boolean);
+
 const allowedOrigins = new Set(
   [
-    env.frontendUrl,
+    ...parseOrigins(env.frontendUrls),
+    normalizeOrigin(env.frontendUrl),
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://dhobi-in.vercel.app",
-  ].filter(Boolean)
+  ]
+    .map((item) => normalizeOrigin(item))
+    .filter(Boolean)
 );
 app.use(
   cors({
@@ -27,12 +37,19 @@ app.use(
       // Allow non-browser tools/calls without Origin header.
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.has(origin)) return callback(null, true);
+      const normalizedOrigin = normalizeOrigin(origin);
+      if (allowedOrigins.has(normalizedOrigin)) return callback(null, true);
+
+      // Allow Vercel preview domains for this project.
+      if (/^https:\/\/dhobi-in-[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin)) {
+        return callback(null, true);
+      }
 
       // During local development, allow Vite on any localhost port.
       if (
         env.nodeEnv !== "production" &&
-        (/^http:\/\/localhost:\d+$/.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(origin))
+        (/^http:\/\/localhost:\d+$/.test(normalizedOrigin) ||
+          /^http:\/\/127\.0\.0\.1:\d+$/.test(normalizedOrigin))
       ) {
         return callback(null, true);
       }

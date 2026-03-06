@@ -19,6 +19,7 @@ Required for boot:
 - `MONGODB_URI`
 - `JWT_SECRET`
 - `FRONTEND_URL`
+- `FRONTEND_URLS` (optional, comma-separated extra frontend domains, e.g. preview URLs)
 
 Required for contact email notifications/replies:
 - `SMTP_HOST`

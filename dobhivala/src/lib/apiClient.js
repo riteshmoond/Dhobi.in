@@ -1,5 +1,5 @@
 const DEFAULT_PROD_API = "https://dhobi-in.onrender.com/api";
-const DEFAULT_DEV_API = "http://localhost:5000/api";
+const DEFAULT_DEV_API = "/api";
 
 const normalizeApiBaseUrl = (url) => {
   const trimmed = String(url || "").replace(/\/+$/, "");
