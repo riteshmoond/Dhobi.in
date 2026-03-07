@@ -59,16 +59,6 @@ const withTimeout = async (promise, timeoutMs) => {
   }
 };
 
-const dispatchContactEmailsInBackground = (contact) => {
-  setImmediate(async () => {
-    try {
-      await withTimeout(sendContactSubmissionEmails(contact), CONTACT_EMAIL_TIMEOUT_MS);
-    } catch (mailErr) {
-      console.error("Contact email send failed:", mailErr.message);
-    }
-  });
-};
-
 // POST /api/contact
 async function createContact(req, res) {
   const { name, email, phone, message } = req.body || {};
@@ -77,7 +67,13 @@ async function createContact(req, res) {
   }
   try {
     const contact = await Contact.create({ name, email, phone, message });
-    dispatchContactEmailsInBackground(contact);
+    try {
+      await withTimeout(sendContactSubmissionEmails(contact), CONTACT_EMAIL_TIMEOUT_MS);
+    } catch (mailErr) {
+      // In serverless environments (Vercel/Render), background tasks may be cut off.
+      // Send within request lifecycle and keep API success even if email fails.
+      console.error("Contact email send failed:", mailErr.message);
+    }
     return res.status(201).json(successResponse({ contact }, "Message received. We'll contact you soon."));
   } catch (err) {
     return res.status(500).json(errorResponse("Failed to submit message"));
