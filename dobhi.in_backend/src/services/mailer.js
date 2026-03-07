@@ -14,6 +14,7 @@ const getTransporter = () => {
     host: env.smtpHost,
     port: env.smtpPort,
     secure: env.smtpSecure,
+    family: 4, // force IPv4
     logger: env.smtpDebug,
     debug: env.smtpDebug,
     connectionTimeout: 20000,

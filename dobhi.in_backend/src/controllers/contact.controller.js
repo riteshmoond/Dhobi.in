@@ -41,7 +41,7 @@ const sendContactSubmissionEmails = async (contact) => {
   }
 };
 
-const CONTACT_EMAIL_TIMEOUT_MS = 8000;
+const CONTACT_EMAIL_TIMEOUT_MS = 30000; // 30 seconds
 
 const withTimeout = async (promise, timeoutMs) => {
   let timer = null;
