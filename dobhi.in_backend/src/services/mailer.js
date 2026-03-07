@@ -16,9 +16,9 @@ const getTransporter = () => {
     secure: env.smtpSecure,
     logger: env.smtpDebug,
     debug: env.smtpDebug,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
     auth: {
       user: env.smtpUser,
       pass: env.smtpPass,
