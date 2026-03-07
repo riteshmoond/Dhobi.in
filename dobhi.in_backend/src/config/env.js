@@ -21,4 +21,6 @@ module.exports = {
   smtpFromEmail: process.env.SMTP_FROM_EMAIL || "",
   contactReceiverEmail: process.env.CONTACT_RECEIVER_EMAIL || "",
   smtpDebug: String(process.env.SMTP_DEBUG || "false").toLowerCase() === "true",
+  resendApiKey: process.env.RESEND_API_KEY || "",
+  resendFromEmail: process.env.RESEND_FROM_EMAIL || "",
 };

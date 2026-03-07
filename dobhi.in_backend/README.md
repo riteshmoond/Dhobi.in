@@ -30,6 +30,10 @@ Required for contact email notifications/replies:
 - `SMTP_FROM_EMAIL`
 - `CONTACT_RECEIVER_EMAIL`
 
+Optional fallback (recommended for cloud where SMTP ports may be blocked):
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL`
+
 ## Security & Validation
 
 - `helmet` security headers enabled
