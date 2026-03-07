@@ -47,8 +47,9 @@ const Contact = () => {
       }
     } catch {
       setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -204,4 +205,3 @@ const Contact = () => {
 };
 
 export default Contact;
-

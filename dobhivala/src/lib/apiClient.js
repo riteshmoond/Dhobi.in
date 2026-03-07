@@ -19,13 +19,16 @@ export const API_BASE_URL =
   );
 
 export const apiFetch = async (path, options = {}) => {
-  const { method = "GET", body, token, headers = {} } = options;
+  const { method = "GET", body, token, headers = {}, timeoutMs = 15000 } = options;
   const requestPath = normalizeApiPath(path);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   let response;
   try {
     response = await fetch(`${API_BASE_URL}${requestPath}`, {
       method,
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -33,12 +36,22 @@ export const apiFetch = async (path, options = {}) => {
       },
       body: body ? JSON.stringify(body) : undefined,
     });
-  } catch {
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      return {
+        success: false,
+        message: "Request timed out. Please try again.",
+        data: null,
+      };
+    }
+
     return {
       success: false,
       message: "Unable to connect to server",
       data: null,
     };
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   let parsed = null;

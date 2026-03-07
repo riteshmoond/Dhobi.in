@@ -25,8 +25,8 @@ const sendContactSubmissionEmails = async (contact) => {
       text: `Name: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone || "Not provided"}\n\nMessage:\n${contact.message}`,
       html: `<h2>New Contact Request</h2><p><b>Name:</b> ${safeName}</p><p><b>Email:</b> ${safeEmail}</p><p><b>Phone:</b> ${safePhone}</p><p><b>Message:</b><br />${safeMessage}</p>`,
     });
-    if (!adminResult.sent && env.nodeEnv !== "production") {
-      console.warn("Admin contact mail skipped:", adminResult.reason || "UNKNOWN");
+    if (!adminResult.sent) {
+      console.error("Admin contact mail failed:", adminResult.reason || "UNKNOWN");
     }
   }
 
@@ -36,9 +36,37 @@ const sendContactSubmissionEmails = async (contact) => {
     text: `Hi ${contact.name},\n\nThanks for contacting us. We received your message and our support team will respond soon.\n\nYour message:\n${contact.message}\n\n- DobhiWala Support`,
     html: `<p>Hi ${safeName},</p><p>Thanks for contacting us. We received your message and our support team will respond soon.</p><p><b>Your message:</b><br />${safeMessage}</p><p>- DobhiWala Support</p>`,
   });
-  if (!userResult.sent && env.nodeEnv !== "production") {
-    console.warn("User acknowledgement mail skipped:", userResult.reason || "UNKNOWN");
+  if (!userResult.sent) {
+    console.error("User acknowledgement mail failed:", userResult.reason || "UNKNOWN");
   }
+};
+
+const CONTACT_EMAIL_TIMEOUT_MS = 8000;
+
+const withTimeout = async (promise, timeoutMs) => {
+  let timer = null;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`Contact email timeout after ${timeoutMs}ms`));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+};
+
+const dispatchContactEmailsInBackground = (contact) => {
+  setImmediate(async () => {
+    try {
+      await withTimeout(sendContactSubmissionEmails(contact), CONTACT_EMAIL_TIMEOUT_MS);
+    } catch (mailErr) {
+      console.error("Contact email send failed:", mailErr.message);
+    }
+  });
 };
 
 // POST /api/contact
@@ -49,13 +77,7 @@ async function createContact(req, res) {
   }
   try {
     const contact = await Contact.create({ name, email, phone, message });
-    try {
-      await sendContactSubmissionEmails(contact);
-    } catch (mailErr) {
-      if (env.nodeEnv !== "production") {
-        console.error("Contact email send failed:", mailErr.message);
-      }
-    }
+    dispatchContactEmailsInBackground(contact);
     return res.status(201).json(successResponse({ contact }, "Message received. We'll contact you soon."));
   } catch (err) {
     return res.status(500).json(errorResponse("Failed to submit message"));
