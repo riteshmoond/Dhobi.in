@@ -1,6 +1,7 @@
 const Service = require("../models/service.model");
 const { successResponse, errorResponse } = require("../utils/apiResponse");
 const { DEFAULT_SERVICES } = require("../utils/defaults");
+const { isDbAvailable } = require("../config/db");
 
 const mapService = (service) => ({
   id: service.code,
@@ -27,6 +28,21 @@ const ensureDefaultServices = async () => {
 };
 
 const getServices = async (req, res) => {
+  if (!isDbAvailable()) {
+    const category = String(req.query.category || "").trim();
+    const services = DEFAULT_SERVICES.filter((service) => {
+      if (service.active === false) return false;
+      if (!["men", "female", "kids"].includes(category)) return true;
+      return service.category === category;
+    });
+
+    return res.status(200).json(
+      successResponse({
+        services: services.map(mapService),
+      })
+    );
+  }
+
   await ensureDefaultServices();
 
   const category = String(req.query.category || "").trim();
@@ -45,6 +61,10 @@ const getServices = async (req, res) => {
 };
 
 const createService = async (req, res) => {
+  if (!isDbAvailable()) {
+    return res.status(503).json(errorResponse("Database unavailable in local dev mode"));
+  }
+
   const name = String(req.body?.name || "").trim();
   const category = String(req.body?.category || "").trim();
 
@@ -74,6 +94,10 @@ const createService = async (req, res) => {
 };
 
 const replaceServices = async (req, res) => {
+  if (!isDbAvailable()) {
+    return res.status(503).json(errorResponse("Database unavailable in local dev mode"));
+  }
+
   const incoming = Array.isArray(req.body?.services) ? req.body.services : null;
   if (!incoming) {
     return res.status(400).json(errorResponse("services array is required"));
@@ -118,6 +142,10 @@ const replaceServices = async (req, res) => {
 };
 
 const updateService = async (req, res) => {
+  if (!isDbAvailable()) {
+    return res.status(503).json(errorResponse("Database unavailable in local dev mode"));
+  }
+
   const code = String(req.params.id || "").trim();
   const service = await Service.findOne({ code });
 
@@ -146,6 +174,10 @@ const updateService = async (req, res) => {
 };
 
 const deleteService = async (req, res) => {
+  if (!isDbAvailable()) {
+    return res.status(503).json(errorResponse("Database unavailable in local dev mode"));
+  }
+
   const code = String(req.params.id || "").trim();
   const deleted = await Service.findOneAndDelete({ code });
 

@@ -1,5 +1,6 @@
 const Settings = require("../models/settings.model");
-const { successResponse } = require("../utils/apiResponse");
+const { successResponse, errorResponse } = require("../utils/apiResponse");
+const { isDbAvailable } = require("../config/db");
 
 const defaultSettingsPayload = {
   deliveryCharge: 50,
@@ -27,11 +28,19 @@ const getOrCreateSettings = async () => {
 };
 
 const getSettings = async (req, res) => {
+  if (!isDbAvailable()) {
+    return res.status(200).json(successResponse({ settings: defaultSettingsPayload }));
+  }
+
   const settings = await getOrCreateSettings();
   return res.status(200).json(successResponse({ settings }));
 };
 
 const updateSettings = async (req, res) => {
+  if (!isDbAvailable()) {
+    return res.status(503).json(errorResponse("Database unavailable in local dev mode"));
+  }
+
   const settings = await getOrCreateSettings();
   const payload = req.body || {};
 
@@ -84,4 +93,5 @@ const updateSettings = async (req, res) => {
 module.exports = {
   getSettings,
   updateSettings,
+  defaultSettingsPayload,
 };

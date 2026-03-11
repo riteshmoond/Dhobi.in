@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ShoppingCart, Menu, ClipboardList, LogOut } from "lucide-react";
+import { ShoppingCart, Menu, ClipboardList, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import {
@@ -22,7 +22,7 @@ const Header = ({
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, admin, logoutCustomer, logoutAdmin } = useAuth();
+  const { user, admin, isUserLoggedIn, logoutCustomer, logoutAdmin } = useAuth();
 
   const allLinks = [
     { name: "Home", path: "/" },
@@ -79,6 +79,15 @@ const Header = ({
     navigate("/auth", { replace: true });
   };
 
+  const handleOrdersClick = () => {
+    if (isUserLoggedIn) {
+      navigate("/orders");
+      return;
+    }
+
+    navigate("/auth", { state: { from: "/orders" } });
+  };
+
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-sky-100/80 backdrop-blur-md shadow-sm">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 md:px-6 h-24">
@@ -130,19 +139,26 @@ const Header = ({
             <div className="text-xs text-sky-600">Estimated</div>
           </div>
 
-          <Button variant="outline" onClick={() => navigate("/orders")}>
+          <Button variant="outline" onClick={handleOrdersClick}>
             <ClipboardList className="w-4 h-4 mr-1" />
             My Orders
           </Button>
 
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={handleLogout}
-            title="Logout"
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
+          {isUserLoggedIn || admin ? (
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={handleLogout}
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button variant="default" onClick={() => navigate("/auth")}>
+              <LogIn className="w-4 h-4 mr-1" />
+              Login
+            </Button>
+          )}
 
          
         </div>
@@ -202,20 +218,33 @@ const Header = ({
                   className="w-full rounded-full"
                   onClick={() => {
                     setOpen(false);
-                    navigate("/orders");
+                    handleOrdersClick();
                   }}
                 >
                   <ClipboardList className="w-4 h-4 mr-2" />
                   My Orders
                 </Button>
-                <Button
-                  variant="destructive"
-                  className="w-full rounded-full gap-2"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </Button>
+                {isUserLoggedIn || admin ? (
+                  <Button
+                    variant="destructive"
+                    className="w-full rounded-full gap-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full rounded-full gap-2"
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/auth");
+                    }}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Login
+                  </Button>
+                )}
               </div>
             </SheetContent>
           </Sheet>

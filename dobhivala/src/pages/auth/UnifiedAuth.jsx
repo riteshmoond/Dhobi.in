@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 
 const UnifiedAuth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginCustomer, loginAdmin, signupCustomer } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [loginAs, setLoginAs] = useState("customer"); // "customer" or "admin"
@@ -17,6 +18,9 @@ const UnifiedAuth = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const customerRedirectPath =
+    typeof location.state?.from === "string" ? location.state.from : "/";
+  const customerRedirectState = location.state?.checkoutState;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +101,10 @@ const UnifiedAuth = () => {
         }
         setFormData({ email: "", password: "", confirmPassword: "", fullName: "" });
         setLoading(false);
-        navigate("/");
+        navigate(customerRedirectPath, {
+          replace: true,
+          state: customerRedirectState,
+        });
       }
     } catch {
       setError("Login failed. Please try again.");

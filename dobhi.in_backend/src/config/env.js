@@ -13,6 +13,10 @@ module.exports = {
     process.env.JWT_REFRESH_SECRET || "dev_refresh_secret_change_me",
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
   mongoUri: process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/dobhi_in",
+  mongoFallbackUri:
+    process.env.MONGODB_FALLBACK_URI || "mongodb://127.0.0.1:27017/dobhi_in",
+  allowStartWithoutDb:
+    String(process.env.ALLOW_START_WITHOUT_DB || "true").toLowerCase() === "true",
   smtpHost: process.env.SMTP_HOST || "",
   smtpPort: Number(process.env.SMTP_PORT) || 587,
   smtpSecure: String(process.env.SMTP_SECURE || "false").toLowerCase() === "true",

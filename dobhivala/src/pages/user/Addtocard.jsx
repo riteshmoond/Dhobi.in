@@ -107,6 +107,7 @@ const Addtocard = ({
                     state: {
                       items: selectedItems.map(({ id, name, price, unit }) => ({
                         id,
+                        serviceCode: String(id),
                         name,
                         price,
                         unit,

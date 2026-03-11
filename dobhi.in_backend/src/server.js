@@ -1,10 +1,22 @@
 const app = require("./app");
 const env = require("./config/env");
-const { connectDB } = require("./config/db");
+const { connectDB, markDbUnavailable } = require("./config/db");
 
 async function startServer() {
   try {
-    await connectDB();
+    try {
+      await connectDB();
+    } catch (error) {
+      markDbUnavailable(error);
+
+      if (!(env.nodeEnv !== "production" && env.allowStartWithoutDb)) {
+        throw error;
+      }
+
+      console.warn(
+        `MongoDB unavailable. Starting API in local dev mode without database: ${error.message}`
+      );
+    }
     
     const server = app.listen(env.port, () => {
       console.log(`API running on http://localhost:${env.port}`);

@@ -48,9 +48,9 @@ const App = () => {
   const [allServices, setAllServices] = useState([]);
   const [adminSettings, setAdminSettings] = useState(defaultAdminSettings);
 
-  const hideChromeOnPaths = ["/auth", "/login"];
+  const hideChromeOnPaths = ["/auth", "/login", "/admin"];
   const shouldShowLayoutChrome =
-    (isUserLoggedIn || isAdminLoggedIn) &&
+    !isAdminLoggedIn &&
     !loading &&
     !hideChromeOnPaths.some((path) => location.pathname.startsWith(path));
 
@@ -186,119 +186,103 @@ const App = () => {
           <Route
             path="/"
             element={
-              isUserLoggedIn ? (
-                <Home
-                  cart={cart}
-                  addToCart={addToCart}
-                  removeFromCart={removeFromCart}
-                  categoryVisibility={adminSettings.categoryVisibility}
-                />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
+              <Home
+                cart={cart}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                categoryVisibility={adminSettings.categoryVisibility}
+              />
             }
           />
 
           <Route
             path="/addtocard"
             element={
-              isUserLoggedIn ? (
-                <Addtocard
-                  cart={cart}
-                  allServices={allServices}
-                  addToCart={addToCart}
-                  removeFromCart={removeFromCart}
-                  totalItems={totalItems}
-                  subtotal={subtotal}
-                />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
+              <Addtocard
+                cart={cart}
+                allServices={allServices}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                totalItems={totalItems}
+                subtotal={subtotal}
+              />
             }
           />
 
           <Route
             path="/male"
             element={
-              isUserLoggedIn ? (
-                <Male
-                  services={
-                    adminSettings.categoryVisibility?.men !== false
-                      ? servicesByCategory.men
-                      : []
-                  }
-                  cart={cart}
-                  addToCart={addToCart}
-                  removeFromCart={removeFromCart}
-                  totalItems={totalItems}
-                  subtotal={subtotal}
-                />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
+              <Male
+                services={
+                  adminSettings.categoryVisibility?.men !== false
+                    ? servicesByCategory.men
+                    : []
+                }
+                cart={cart}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                totalItems={totalItems}
+                subtotal={subtotal}
+              />
             }
           />
 
           <Route
             path="/female"
             element={
-              isUserLoggedIn ? (
-                <Female
-                  services={
-                    adminSettings.categoryVisibility?.female !== false
-                      ? servicesByCategory.female
-                      : []
-                  }
-                  cart={cart}
-                  addToCart={addToCart}
-                  removeFromCart={removeFromCart}
-                  totalItems={totalItems}
-                  subtotal={subtotal}
-                />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
+              <Female
+                services={
+                  adminSettings.categoryVisibility?.female !== false
+                    ? servicesByCategory.female
+                    : []
+                }
+                cart={cart}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                totalItems={totalItems}
+                subtotal={subtotal}
+              />
             }
           />
 
           <Route
             path="/kids"
             element={
-              isUserLoggedIn ? (
-                <Kids
-                  services={
-                    adminSettings.categoryVisibility?.kids !== false
-                      ? servicesByCategory.kids
-                      : []
-                  }
-                  cart={cart}
-                  addToCart={addToCart}
-                  removeFromCart={removeFromCart}
-                  totalItems={totalItems}
-                  subtotal={subtotal}
-                />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
+              <Kids
+                services={
+                  adminSettings.categoryVisibility?.kids !== false
+                    ? servicesByCategory.kids
+                    : []
+                }
+                cart={cart}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                totalItems={totalItems}
+                subtotal={subtotal}
+              />
             }
           />
 
           <Route
             path="/about"
-            element={
-              isUserLoggedIn ? <About /> : <Navigate to="/auth" replace />
-            }
+            element={<About />}
           />
           <Route
             path="/contact"
-            element={
-              isUserLoggedIn ? <Contact /> : <Navigate to="/auth" replace />
-            }
+            element={<Contact />}
           />
           <Route
             path="/checkout"
             element={
-              isUserLoggedIn ? <Checkout /> : <Navigate to="/auth" replace />
+              isUserLoggedIn ? (
+                <Checkout />
+              ) : (
+                <Navigate
+                  to="/auth"
+                  replace
+                  state={{ from: location.pathname, checkoutState: location.state }}
+                />
+              )
             }
           />
           <Route
@@ -337,7 +321,7 @@ const App = () => {
           />
 
           {/* Catch all - redirect to auth */}
-          <Route path="*" element={<Navigate to="/auth" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
       </main>

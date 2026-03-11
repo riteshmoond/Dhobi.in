@@ -17,6 +17,8 @@ Copy `.env.example` to `.env` and update values.
 
 Required for boot:
 - `MONGODB_URI`
+- `MONGODB_FALLBACK_URI` (recommended for local development when Atlas SRV lookup is blocked)
+- `ALLOW_START_WITHOUT_DB` (defaults to `true` in local development so public routes can boot with fallback data)
 - `JWT_SECRET`
 - `FRONTEND_URL`
 - `FRONTEND_URLS` (optional, comma-separated extra frontend domains, e.g. preview URLs)

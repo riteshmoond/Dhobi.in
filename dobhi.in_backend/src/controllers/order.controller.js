@@ -89,16 +89,23 @@ const createOrder = async (req, res) => {
     return res.status(400).json(errorResponse("Selected payment method is unavailable"));
   }
 
+  const normalizedItems = items.map((item) => ({
+    serviceCode: String(item.id || item.serviceCode || item.code || "").trim(),
+    name: String(item.name || "").trim(),
+    price: Number(item.price) || 0,
+    qty: Number(item.qty) || 1,
+    unit: String(item.unit || "Wash & Iron").trim() || "Wash & Iron",
+  }));
+
+  const invalidItem = normalizedItems.find((item) => !item.serviceCode || !item.name);
+  if (invalidItem) {
+    return res.status(400).json(errorResponse("Each order item must include serviceCode and name"));
+  }
+
   const order = await Order.create({
     orderId: await getNextOrderId(),
     customer: userId,
-    items: items.map((item) => ({
-      serviceCode: String(item.id || item.serviceCode || ""),
-      name: String(item.name || ""),
-      price: Number(item.price) || 0,
-      qty: Number(item.qty) || 1,
-      unit: String(item.unit || "Wash & Iron"),
-    })),
+    items: normalizedItems,
     subtotal,
     deliveryCharge,
     rushDelivery: Boolean(body.rushDelivery),

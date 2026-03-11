@@ -91,11 +91,21 @@ const updateSettingsSchema = z.object({
 const orderItemSchema = z.object({
   id: z.union([z.string(), z.number()]).optional(),
   serviceCode: z.union([z.string(), z.number()]).optional(),
+  code: z.union([z.string(), z.number()]).optional(),
   name: z.string().trim().min(1),
   price: z.coerce.number().min(0),
   qty: z.coerce.number().int().min(1),
   unit: z.string().trim().optional(),
-});
+}).refine(
+  (item) =>
+    String(item.id ?? "").trim().length > 0 ||
+    String(item.serviceCode ?? "").trim().length > 0 ||
+    String(item.code ?? "").trim().length > 0,
+  {
+    message: "id or serviceCode is required",
+    path: ["id"],
+  }
+);
 
 const createOrderSchema = z.object({
   items: z.array(orderItemSchema).min(1),
