@@ -5,12 +5,13 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { slides, cards, dryCleanPlans, washRates, } from "./Homeservices";
+import { slides, dryCleanPlans, washRates } from "./Homeservices";
 
 export default function Home({
     cart,
     addToCart,
     removeFromCart,
+    servicesByCategory = { men: [], female: [], kids: [] },
     categoryVisibility = { men: true, female: true, kids: true },
 }) {
     const navigate = useNavigate();
@@ -28,9 +29,9 @@ export default function Home({
         return () => clearInterval(auto);
     }, []);
 
-    const maleCards = cards.slice(0, 4);
-    const femaleCards = cards.slice(4, 8);
-    const kidsCards = cards.slice(8, 12);
+    const maleCards = servicesByCategory.men.slice(0, 4);
+    const femaleCards = servicesByCategory.female.slice(0, 4);
+    const kidsCards = servicesByCategory.kids.slice(0, 4);
 
     const [openDropdown, setOpenDropdown] = useState(null);
 

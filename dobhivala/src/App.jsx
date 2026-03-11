@@ -41,11 +41,27 @@ import { getServicesApi, getSettingsApi } from "./lib/backendApi";
 
 const CART_STORAGE_KEY = "dobhivala_cart_v2";
 
+const sanitizeCart = (cartData, services) => {
+  if (!cartData || typeof cartData !== "object") return {};
+
+  const validIds = new Set((services || []).map((service) => String(service.id)));
+
+  return Object.entries(cartData).reduce((next, [id, qty]) => {
+    const normalizedQty = Number(qty);
+    if (!validIds.has(String(id)) || !Number.isFinite(normalizedQty) || normalizedQty <= 0) {
+      return next;
+    }
+
+    next[id] = Math.floor(normalizedQty);
+    return next;
+  }, {});
+};
+
 const App = () => {
   const { isUserLoggedIn, isAdminLoggedIn, loading } = useAuth();
   const location = useLocation();
   const [cart, setCart] = useState({});
-  const [allServices, setAllServices] = useState([]);
+  const [allServices, setAllServices] = useState(() => loadServicesFromStorage());
   const [adminSettings, setAdminSettings] = useState(defaultAdminSettings);
 
   const hideChromeOnPaths = ["/auth", "/login", "/admin"];
@@ -93,7 +109,7 @@ const App = () => {
     const stored = localStorage.getItem(CART_STORAGE_KEY);
     if (stored) {
       try {
-        setCart(JSON.parse(stored));
+        setCart(sanitizeCart(JSON.parse(stored), allServices));
       } catch {
         setCart({});
       }
@@ -133,6 +149,8 @@ const App = () => {
   }, []);
 
   const addToCart = (id) => {
+    const itemExists = allServices.some((service) => String(service.id) === String(id));
+    if (!itemExists) return;
     setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
   };
 
@@ -145,6 +163,13 @@ const App = () => {
       return next;
     });
   };
+
+  useEffect(() => {
+    setCart((prev) => {
+      const sanitized = sanitizeCart(prev, allServices);
+      return JSON.stringify(prev) === JSON.stringify(sanitized) ? prev : sanitized;
+    });
+  }, [allServices]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -190,6 +215,7 @@ const App = () => {
                 cart={cart}
                 addToCart={addToCart}
                 removeFromCart={removeFromCart}
+                servicesByCategory={servicesByCategory}
                 categoryVisibility={adminSettings.categoryVisibility}
               />
             }
