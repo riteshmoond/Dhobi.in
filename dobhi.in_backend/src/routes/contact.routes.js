@@ -7,6 +7,7 @@ const {
 } = require("../controllers/contact.controller");
 const authGuard = require("../middlewares/authGuard");
 const asyncHandler = require("../middlewares/asyncHandler");
+const requireDb = require("../middlewares/requireDb");
 const validateRequest = require("../middlewares/validateRequest");
 const {
   createContactSchema,
@@ -17,12 +18,13 @@ const {
 const router = express.Router();
 
 // User: submit contact form
-router.post("/", validateRequest(createContactSchema), asyncHandler(createContact));
+router.post("/", requireDb, validateRequest(createContactSchema), asyncHandler(createContact));
 // Admin: get all contacts
-router.get("/", authGuard("admin"), asyncHandler(getContacts));
+router.get("/", requireDb, authGuard("admin"), asyncHandler(getContacts));
 // Admin: update contact status
 router.patch(
   "/:id",
+  requireDb,
   authGuard("admin"),
   validateRequest(updateContactStatusSchema),
   asyncHandler(updateContactStatus)
@@ -30,6 +32,7 @@ router.patch(
 // Admin: send reply to customer email
 router.post(
   "/:id/reply",
+  requireDb,
   authGuard("admin"),
   validateRequest(replyContactSchema),
   asyncHandler(replyToContact)

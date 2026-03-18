@@ -19,6 +19,7 @@ Required for boot:
 - `MONGODB_URI`
 - `MONGODB_FALLBACK_URI` (recommended for local development when Atlas SRV lookup is blocked)
 - `ALLOW_START_WITHOUT_DB` (defaults to `true` in local development so public routes can boot with fallback data)
+- `USE_MEMORY_DB_IN_DEV` (defaults to `true`; when Atlas and local Mongo both fail, backend will try an in-memory MongoDB for local dev)
 - `JWT_SECRET`
 - `FRONTEND_URL`
 - `FRONTEND_URLS` (optional, comma-separated extra frontend domains, e.g. preview URLs)
@@ -89,6 +90,8 @@ Current tests:
 ## Notes
 
 - Auth uses MongoDB (`users` collection).
+- In development, startup order is: `MONGODB_URI` -> `MONGODB_FALLBACK_URI` -> in-memory MongoDB.
+- `GET /api/health` now reports database availability, active mode, and any connection reason.
 - Admin seed auto-creates on first admin login attempt:
   - email: `admin@dhobi.in`
   - password: `admin123`

@@ -10,6 +10,7 @@ const {
 } = require("../controllers/auth.controller");
 const validateRequest = require("../middlewares/validateRequest");
 const authGuard = require("../middlewares/authGuard");
+const requireDb = require("../middlewares/requireDb");
 const { authLimiter } = require("../middlewares/security");
 const {
   loginSchema,
@@ -19,11 +20,11 @@ const {
 
 const router = express.Router();
 
-router.post("/signup", authLimiter, validateRequest(signupSchema), signupCustomer);
-router.post("/login", authLimiter, validateRequest(loginSchema), loginCustomer);
-router.post("/admin/login", authLimiter, validateRequest(loginSchema), loginAdmin);
-router.post("/refresh", authLimiter, validateRequest(refreshTokenSchema), refreshAccessToken);
-router.post("/logout", validateRequest(refreshTokenSchema), logout);
-router.get("/me", authGuard(), getCurrentUser);
+router.post("/signup", authLimiter, validateRequest(signupSchema), requireDb, signupCustomer);
+router.post("/login", authLimiter, validateRequest(loginSchema), requireDb, loginCustomer);
+router.post("/admin/login", authLimiter, validateRequest(loginSchema), requireDb, loginAdmin);
+router.post("/refresh", authLimiter, validateRequest(refreshTokenSchema), requireDb, refreshAccessToken);
+router.post("/logout", validateRequest(refreshTokenSchema), requireDb, logout);
+router.get("/me", requireDb, authGuard(), getCurrentUser);
 
 module.exports = router;

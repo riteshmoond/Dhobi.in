@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { slides, dryCleanPlans, washRates } from "./Homeservices";
+import { slides, dryCleanPlans } from "./Homeservices";
 
 export default function Home({
     cart,
@@ -19,7 +19,7 @@ export default function Home({
     const MotionArticle = motion.article;
 
     const [active, setActive] = useState(0);
-    const [activeTab, setActiveTab] = useState("dryclean");
+    const [activeTab, setActiveTab] = useState("wash");
 
     const nextSlide = () => setActive((prev) => (prev + 1) % slides.length);
     const prevSlide = () => setActive((prev) => (prev - 1 + slides.length) % slides.length);
@@ -157,72 +157,10 @@ export default function Home({
                         </div>
                     )}
 
-                    {activeTab === "wash" && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {washRates.map((plan) => (
-                                <div key={plan.id} className="bg-white rounded-2xl p-5 shadow-sm border hover:shadow-lg transition">
-                                    <div className="flex gap-4 items-center">
-                                        <img src={plan.image} alt={plan.title} className="w-20 h-20 rounded-xl object-cover" />
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-[#034f7a]">{plan.title}</h3>
-                                            <p className="text-sm text-slate-600">{plan.description}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-2xl font-extrabold text-[#0284c7]">{plan.price}</p>
-                                            <p className="text-xs text-slate-400">quick turn</p>
-                                        </div>
-                                    </div>
-
-                                    <ul className="mt-4 text-sm space-y-2 text-slate-700">
-                                        {plan.features?.map((f, i) => (
-                                            <li key={i} className="flex items-start gap-3">
-                                                <span className="w-2 h-2 bg-[#0284c7] rounded-full inline-block mt-2" />
-                                                <span>{f}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <small className="text-xs text-slate-500">Turnaround: {plan.turnaround ?? "24-72 hrs"}</small>
-                                        <Button variant="outline" className="rounded-full px-4 py-2">Select</Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* {activeTab === "prepaid" && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {prepaidPlans.map((plan, idx) => (
-                                <div key={idx} className="bg-gradient-to-b from-white to-[#e6f9ff] rounded-2xl p-6 border shadow hover:shadow-xl transition">
-                                    <div className="h-1 w-full bg-gradient-to-r from-[#0284c7] to-[#06b6d4] rounded mb-4" />
-                                    <img src={plan.image} alt={plan.title} className="w-20 h-20 rounded-full mx-auto mb-4 shadow-sm" />
-                                    <h3 className="text-xl font-bold text-center text-[#045f9a]">{plan.title}</h3>
-                                    <p className="text-sm text-center text-slate-600 mt-2">{plan.desc}</p>
-
-                                    <div className="text-center mt-4">
-                                        <p className="text-3xl font-extrabold text-[#0ea5c9]">{plan.benefit}</p>
-                                        <p className="text-xs text-slate-500 mt-1">Instant credit applied</p>
-                                    </div>
-
-                                    <ul className="mt-4 text-sm text-slate-700 space-y-2">
-                                        <li className="flex items-center justify-between"><span>Priority Pickup</span><span className="text-xs text-[#045f9a] font-semibold">Included</span></li>
-                                        <li className="flex items-center justify-between"><span>Exclusive Offers</span><span className="text-xs text-[#045f9a] font-semibold">Yes</span></li>
-                                        <li className="flex items-center justify-between"><span>Validity</span><span className="text-xs text-[#045f9a] font-semibold">3 months</span></li>
-                                    </ul>
-
-                                    <div className="mt-6 flex justify-center">
-                                        <Button className="bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-full px-6 py-2">Buy Plan</Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )} */}
-                </div>
-            </section>
-
+            {activeTab === "wash" && (
+            <>
             {/* ========== CATEGORIES (Male / Female / Kids) ========== */}
-            <section className="w-full max-w-6xl mx-auto px-4 mt-14">
+            <section className="w-full max-w-6xl mx-auto px-4 mt-0 ">
                 {[
                     { title: "Male", data: maleCards, route: "/male" },
                     { title: "Female", data: femaleCards, route: "/female" },
@@ -390,6 +328,11 @@ export default function Home({
                     </div>
                     ))}
             </section>
+            </>
+            )}
+                </div>
+            </section>
+
 
              {/* ========== ABOUT US SECTION ========== */}
             <section className="w-full max-w-6xl mx-auto px-4 py-16">

@@ -4,6 +4,8 @@ const env = require("./env");
 
 let dbAvailable = false;
 let dbUnavailableReason = "";
+let activeDbMode = "disconnected";
+let memoryServer = null;
 
 const isSrvLookupError = (error) => {
   const message = String(error?.message || "");
@@ -19,11 +21,40 @@ async function connectWithUri(uri) {
   });
 }
 
+async function connectMemoryDb() {
+  if (env.isProduction || !env.useMemoryDbInDev) {
+    return false;
+  }
+
+  let MongoMemoryServer;
+  try {
+    ({ MongoMemoryServer } = require("mongodb-memory-server"));
+  } catch (error) {
+    dbUnavailableReason = `mongodb-memory-server unavailable: ${error.message}`;
+    return false;
+  }
+
+  memoryServer = await MongoMemoryServer.create({
+    instance: {
+      dbName: "dobhi_in",
+    },
+  });
+
+  const uri = memoryServer.getUri("dobhi_in");
+  await connectWithUri(uri);
+  dbAvailable = true;
+  dbUnavailableReason = "";
+  activeDbMode = "memory";
+  console.log(`MongoDB connected via in-memory dev server: ${uri}`);
+  return true;
+}
+
 async function connectDB() {
   try {
     await connectWithUri(env.mongoUri);
     dbAvailable = true;
     dbUnavailableReason = "";
+    activeDbMode = "primary";
     console.log("MongoDB connected");
     return;
   } catch (error) {
@@ -45,29 +76,47 @@ async function connectDB() {
       await connectWithUri(env.mongoFallbackUri);
       dbAvailable = true;
       dbUnavailableReason = "";
+      activeDbMode = "fallback";
       console.log("MongoDB connected via fallback URI");
       return;
     } catch (fallbackError) {
+      const fallbackReason = String(fallbackError?.message || fallbackError || "");
+      const memoryDbConnected = await connectMemoryDb().catch((memoryError) => {
+        dbAvailable = false;
+        dbUnavailableReason = fallbackReason;
+        activeDbMode = "disconnected";
+        return false;
+      });
+
+      if (memoryDbConnected) {
+        return;
+      }
+
       dbAvailable = false;
-      dbUnavailableReason = String(fallbackError?.message || fallbackError || "");
+      if (!dbUnavailableReason) {
+        dbUnavailableReason = fallbackReason;
+      }
+      activeDbMode = "disconnected";
       throw fallbackError;
     }
   }
-
 }
 
 const markDbUnavailable = (error) => {
   dbAvailable = false;
   dbUnavailableReason = String(error?.message || error || "");
+  activeDbMode = "disconnected";
 };
 
 const isDbAvailable = () => dbAvailable && mongoose.connection.readyState === 1;
 
 const getDbUnavailableReason = () => dbUnavailableReason;
+const getDbMode = () => activeDbMode;
 
 module.exports = {
   connectDB,
   isDbAvailable,
   markDbUnavailable,
   getDbUnavailableReason,
+  getDbMode,
 };

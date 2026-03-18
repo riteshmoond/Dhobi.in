@@ -9,5 +9,10 @@ describe("Health API", () => {
     expect(response.body.success).toBe(true);
     expect(response.body.data.status).toBe("ok");
     expect(response.body.data.service).toBe("dobhi.in_backend");
+    expect(response.body.data.database).toEqual({
+      available: false,
+      mode: "disconnected",
+      reason: null,
+    });
   });
 });

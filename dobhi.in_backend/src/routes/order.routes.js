@@ -2,6 +2,7 @@ const express = require("express");
 
 const asyncHandler = require("../middlewares/asyncHandler");
 const authGuard = require("../middlewares/authGuard");
+const requireDb = require("../middlewares/requireDb");
 const validateRequest = require("../middlewares/validateRequest");
 const {
   createOrder,
@@ -19,6 +20,8 @@ const {
 } = require("../validators/requestSchemas");
 
 const router = express.Router();
+
+router.use(requireDb);
 
 router.post("/", authGuard(), validateRequest(createOrderSchema), asyncHandler(createOrder));
 router.get("/my", authGuard(), asyncHandler(getMyOrders));
