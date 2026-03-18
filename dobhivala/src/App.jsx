@@ -66,7 +66,6 @@ const App = () => {
 
   const hideChromeOnPaths = ["/auth", "/login", "/admin"];
   const shouldShowLayoutChrome =
-    !isAdminLoggedIn &&
     !loading &&
     !hideChromeOnPaths.some((path) => location.pathname.startsWith(path));
 
