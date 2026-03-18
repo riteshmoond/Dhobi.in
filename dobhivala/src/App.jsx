@@ -330,9 +330,7 @@ const App = () => {
           />
           <Route
             path="/rate"
-            element={
-              isUserLoggedIn ? <Rate /> : <Navigate to="/auth" replace />
-            }
+            element={<Rate />}
           />
 
           {/* Admin Routes */}
