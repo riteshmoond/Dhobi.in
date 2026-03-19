@@ -27,10 +27,9 @@ export const getTrackingStepFromCreatedAt = (createdAt, nowMs = Date.now()) => {
 
 export const normalizeOrderTracking = (order, nowMs = Date.now()) => {
   const stepFromTime = getTrackingStepFromCreatedAt(order?.createdAt, nowMs);
-  const manualStep = Number.isInteger(Number(order?.trackingStep))
-    ? clampStep(Number(order.trackingStep))
-    : 0;
-  const finalStep = Math.max(stepFromTime, manualStep);
+  const parsedManualStep = Number(order?.trackingStep);
+  const hasManualStep = Number.isInteger(parsedManualStep);
+  const finalStep = hasManualStep ? clampStep(parsedManualStep) : stepFromTime;
 
   return {
     ...order,
