@@ -30,6 +30,7 @@ import Rate from "./pages/user/Rate";
 // Utils & Libraries
 import {
   loadServicesFromStorage,
+  mergeServicesWithDefaults,
   splitServicesByCategory,
 } from "./lib/servicesStore";
 import {
@@ -77,7 +78,7 @@ const App = () => {
       ]);
 
       if (servicesResult.success && Array.isArray(servicesResult.data?.services)) {
-        setAllServices(servicesResult.data.services);
+        setAllServices(mergeServicesWithDefaults(servicesResult.data.services));
       } else {
         setAllServices(loadServicesFromStorage());
       }
@@ -124,7 +125,7 @@ const App = () => {
     const handleServicesUpdate = async () => {
       const result = await getServicesApi();
       if (result.success && Array.isArray(result.data?.services)) {
-        setAllServices(result.data.services);
+        setAllServices(mergeServicesWithDefaults(result.data.services));
         return;
       }
       setAllServices(loadServicesFromStorage());
@@ -330,7 +331,16 @@ const App = () => {
           />
           <Route
             path="/rate"
-            element={<Rate />}
+            element={
+              <Rate
+                cart={cart}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                allServices={allServices}
+                totalItems={totalItems}
+                subtotal={subtotal}
+              />
+            }
           />
 
           {/* Admin Routes */}

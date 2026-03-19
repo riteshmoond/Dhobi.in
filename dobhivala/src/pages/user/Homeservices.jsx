@@ -21,7 +21,6 @@ export const slides = [
     },
 ];
 
-// 🧺 Service category cards
 export const cards = [
     {
         id: 1,
@@ -31,7 +30,6 @@ export const cards = [
         img: "https://cdn-icons-png.flaticon.com/128/2503/2503380.png",
         popular: true,
     },
-
     {
         id: 2,
         name: "Pant",
@@ -56,7 +54,6 @@ export const cards = [
         img: "https://cdn-icons-png.flaticon.com/128/15487/15487198.png",
         popular: true,
     },
-
     {
         id: "F1",
         name: "Dress",
@@ -123,63 +120,55 @@ export const cards = [
     },
 ];
 
-// 🧼 Dry Clean Rates section
 export const dryCleanPlans = [
     {
         id: 1,
         title: "Signature Dry Clean",
         img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4gBB3fD87Nj9kRiOWbYUEcgBqclr5HswQFg&s",
         description: "Premium fabric-friendly dry cleaning.",
-        price: "₹199",
+        price: "Rs 199",
         subtitle: "per item",
         features: [
             "Premium Care",
             "Fabric Safety",
             "No Shrinkage",
         ],
-
         rateList: [
-            { item: "Shirt", price: "₹80" },
-            { item: "Pant / Trouser", price: "₹100" },
-            { item: "T-Shirt", price: "₹70" },
-            { item: "Jeans", price: "₹120" },
-            { item: "Kurta", price: "₹110" },
-            { item: "Safari Suit", price: "₹180" },
-            { item: "Blazer", price: "₹250" },
-            { item: "Coat", price: "₹220" },
-            { item: "Sweater", price: "₹130" },
-            { item: "Shawl", price: "₹160" },
+            { item: "Shirt", price: "Rs 80", serviceId: "DC1", img: "https://cdn-icons-png.flaticon.com/128/2503/2503380.png" },
+            { item: "Pant / Trouser", price: "Rs 100", serviceId: "DC2", img: "https://cdn-icons-png.flaticon.com/128/862/862993.png" },
+            { item: "T-Shirt", price: "Rs 70", serviceId: "DC3", img: "https://cdn-icons-png.flaticon.com/512/892/892458.png" },
+            { item: "Jeans", price: "Rs 120", serviceId: "DC4", img: "https://cdn-icons-png.flaticon.com/128/5258/5258257.png" },
+            { item: "Kurta", price: "Rs 110", serviceId: "DC5", img: "https://cdn-icons-png.flaticon.com/512/9992/9992462.png" },
+            { item: "Safari Suit", price: "Rs 180", serviceId: "DC6", img: "https://cdn-icons-png.flaticon.com/128/3345/3345814.png" },
+            { item: "Blazer", price: "Rs 250", serviceId: "DC7", img: "https://cdn-icons-png.flaticon.com/128/15487/15487198.png" },
+            { item: "Coat", price: "Rs 220", serviceId: "DC8", img: "https://cdn-icons-png.flaticon.com/128/15442/15442567.png" },
+            { item: "Sweater", price: "Rs 130", serviceId: "DC9", img: "https://cdn-icons-png.flaticon.com/128/9431/9431166.png" },
+            { item: "Shawl", price: "Rs 160", serviceId: "DC10", img: "https://cdn-icons-png.flaticon.com/128/6263/6263422.png" },
         ],
     },
-
-   
     {
         id: 3,
         title: "Leather & Delicate",
         img: "https://thumbs.dreamstime.com/b/leather-dry-cleaning-icon-simple-illustration-laundry-collection-creative-web-design-templates-infographics-more-181025829.jpg",
         description: "Leather, woolens & premium fabrics expert care.",
-        price: "₹399",
+        price: "Rs 399",
         subtitle: "per item",
         features: [
             "Leather Conditioning",
             "Soft Finish",
             "Hand Processed",
         ],
-
         rateList: [
-            { item: "Leather Jacket", price: "₹500" },
-            { item: "Leather Bag", price: "₹350" },
-            { item: "Leather Belt", price: "₹150" },
-            { item: "Woolen Coat", price: "₹280" },
-            { item: "Pashmina Shawl", price: "₹350" },
-            { item: "Silk Saree", price: "₹250" },
-            { item: "Embroidery Dress", price: "₹450" },
-            { item: "Boots", price: "₹250" },
-            { item: "Delicate Blanket", price: "₹300" },
-            { item: "Premium Suit", price: "₹450" },
+            { item: "Leather Jacket", price: "Rs 500", serviceId: "DC11", img: "https://cdn-icons-png.flaticon.com/128/2806/2806175.png" },
+            { item: "Leather Bag", price: "Rs 350", serviceId: "DC12", img: "https://cdn-icons-png.flaticon.com/128/3081/3081559.png" },
+            { item: "Leather Belt", price: "Rs 150", serviceId: "DC13", img: "https://cdn-icons-png.flaticon.com/128/599/599402.png" },
+            { item: "Woolen Coat", price: "Rs 280", serviceId: "DC14", img: "https://cdn-icons-png.flaticon.com/128/3636/3636674.png" },
+            { item: "Pashmina Shawl", price: "Rs 350", serviceId: "DC15", img: "https://cdn-icons-png.flaticon.com/128/6263/6263422.png" },
+            { item: "Silk Saree", price: "Rs 250", serviceId: "DC16", img: "https://cdn-icons-png.flaticon.com/128/5638/5638937.png" },
+            { item: "Embroidery Dress", price: "Rs 450", serviceId: "DC17", img: "https://cdn-icons-png.flaticon.com/128/3534/3534312.png" },
+            { item: "Boots", price: "Rs 250", serviceId: "DC18", img: "https://cdn-icons-png.flaticon.com/128/2589/2589874.png" },
+            { item: "Delicate Blanket", price: "Rs 300", serviceId: "DC19", img: "https://cdn-icons-png.flaticon.com/128/2936/2936886.png" },
+            { item: "Premium Suit", price: "Rs 450", serviceId: "DC20", img: "https://cdn-icons-png.flaticon.com/128/15487/15487148.png" },
         ],
     }
-
 ];
-
-

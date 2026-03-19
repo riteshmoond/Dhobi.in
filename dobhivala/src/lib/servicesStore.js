@@ -1,6 +1,7 @@
 import { menServices } from "../pages/user/Menservices";
 import { femaleServices } from "../pages/user/Femaleservices";
 import { kidsservices } from "../pages/user/Kidsservices";
+import { dryCleanServices } from "../pages/user/DryCleanServices";
 
 export const SERVICES_STORAGE_KEY = "dobhivala_services_v1";
 
@@ -8,6 +9,7 @@ export const getDefaultServices = () => [
   ...menServices.map((item) => ({ ...item, category: "men" })),
   ...femaleServices.map((item) => ({ ...item, category: "female" })),
   ...kidsservices.map((item) => ({ ...item, category: "kids" })),
+  ...dryCleanServices.map((item) => ({ ...item, category: "dryclean" })),
 ];
 
 const normalizeService = (service) => ({
@@ -28,7 +30,7 @@ export const loadServicesFromStorage = () => {
   try {
     const raw = JSON.parse(localStorage.getItem(SERVICES_STORAGE_KEY));
     if (!Array.isArray(raw) || raw.length === 0) return getDefaultServices();
-    return raw.map(normalizeService);
+    return mergeServicesWithDefaults(raw);
   } catch {
     return getDefaultServices();
   }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ShoppingCart, Menu, ClipboardList, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "/public/logo.png";
+import logo from "/logo.png";
 import {
   Sheet,
   SheetContent,
