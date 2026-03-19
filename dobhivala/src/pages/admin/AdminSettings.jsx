@@ -227,6 +227,68 @@ const AdminSettings = ({ settings, setSettings, saveSettings }) => {
           </div>
         </div>
 
+        <div className="border border-slate-500 rounded-xl p-4 space-y-4">
+          <p className="text-sm font-bold text-indigo-300 uppercase tracking-wider">
+            Wash Option Pricing
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-sm text-indigo-300 mb-2">Iron Adjustment (Rs)</label>
+              <input
+                type="number"
+                value={settings.serviceVariantPricing?.ironAdjustment ?? 0}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    serviceVariantPricing: {
+                      ...prev.serviceVariantPricing,
+                      ironAdjustment: Number(e.target.value) || 0,
+                    },
+                  }))
+                }
+                className="w-full bg-slate-600 border border-slate-500 text-slate-200 rounded-xl px-4 py-3 font-semibold"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-indigo-300 mb-2">Wash Adjustment (Rs)</label>
+              <input
+                type="number"
+                value={settings.serviceVariantPricing?.washAdjustment ?? 0}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    serviceVariantPricing: {
+                      ...prev.serviceVariantPricing,
+                      washAdjustment: Number(e.target.value) || 0,
+                    },
+                  }))
+                }
+                className="w-full bg-slate-600 border border-slate-500 text-slate-200 rounded-xl px-4 py-3 font-semibold"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-indigo-300 mb-2">Dry Clean Adjustment (Rs)</label>
+              <input
+                type="number"
+                value={settings.serviceVariantPricing?.dryCleanAdjustment ?? 0}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    serviceVariantPricing: {
+                      ...prev.serviceVariantPricing,
+                      dryCleanAdjustment: Number(e.target.value) || 0,
+                    },
+                  }))
+                }
+                className="w-full bg-slate-600 border border-slate-500 text-slate-200 rounded-xl px-4 py-3 font-semibold"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-slate-400">
+            Final option price = base product price + adjustment.
+          </p>
+        </div>
+
         <div className="border border-slate-500 rounded-xl p-4 space-y-3">
           <label className="flex items-center gap-2 text-slate-200 font-semibold">
             <input

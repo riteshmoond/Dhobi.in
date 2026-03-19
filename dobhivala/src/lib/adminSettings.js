@@ -1,5 +1,16 @@
 export const ADMIN_SETTINGS_KEY = "admin_settings";
 
+export const defaultServiceVariantPricing = {
+  ironAdjustment: -10,
+  washAdjustment: -5,
+  dryCleanAdjustment: 20,
+};
+
+const toNumberOrDefault = (value, fallback) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 export const defaultAdminSettings = {
   deliveryCharge: 50,
   minOrderValue: 200,
@@ -24,11 +35,12 @@ export const defaultAdminSettings = {
     card: true,
     netbanking: true,
   },
+  serviceVariantPricing: defaultServiceVariantPricing,
 };
 
 export const normalizeSettings = (settings) => ({
-  deliveryCharge: Number(settings?.deliveryCharge) || 0,
-  minOrderValue: Number(settings?.minOrderValue) || 0,
+  deliveryCharge: toNumberOrDefault(settings?.deliveryCharge, 0),
+  minOrderValue: toNumberOrDefault(settings?.minOrderValue, 0),
   businessHours: String(settings?.businessHours || defaultAdminSettings.businessHours),
   serviceArea: String(settings?.serviceArea || defaultAdminSettings.serviceArea),
   brandName: String(settings?.brandName || defaultAdminSettings.brandName),
@@ -37,7 +49,7 @@ export const normalizeSettings = (settings) => ({
   supportEmail: String(settings?.supportEmail || defaultAdminSettings.supportEmail),
   supportAddress: String(settings?.supportAddress || defaultAdminSettings.supportAddress),
   rushDeliveryEnabled: Boolean(settings?.rushDeliveryEnabled),
-  rushDeliveryCharge: Number(settings?.rushDeliveryCharge) || 0,
+  rushDeliveryCharge: toNumberOrDefault(settings?.rushDeliveryCharge, 0),
   ordersEnabled: settings?.ordersEnabled !== false,
   categoryVisibility: {
     men: settings?.categoryVisibility?.men !== false,
@@ -49,6 +61,20 @@ export const normalizeSettings = (settings) => ({
     upi: settings?.paymentMethods?.upi !== false,
     card: settings?.paymentMethods?.card !== false,
     netbanking: settings?.paymentMethods?.netbanking !== false,
+  },
+  serviceVariantPricing: {
+    ironAdjustment: toNumberOrDefault(
+      settings?.serviceVariantPricing?.ironAdjustment,
+      defaultServiceVariantPricing.ironAdjustment
+    ),
+    washAdjustment: toNumberOrDefault(
+      settings?.serviceVariantPricing?.washAdjustment,
+      defaultServiceVariantPricing.washAdjustment
+    ),
+    dryCleanAdjustment: toNumberOrDefault(
+      settings?.serviceVariantPricing?.dryCleanAdjustment,
+      defaultServiceVariantPricing.dryCleanAdjustment
+    ),
   },
 });
 

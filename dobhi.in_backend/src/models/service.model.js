@@ -32,9 +32,26 @@ const serviceSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    optionPrices: {
+      iron: {
+        type: Number,
+        min: 0,
+        default: 0,
+      },
+      wash: {
+        type: Number,
+        min: 0,
+        default: 0,
+      },
+      dryclean: {
+        type: Number,
+        min: 0,
+        default: 0,
+      },
+    },
     category: {
       type: String,
-      enum: ["men", "female", "kids"],
+      enum: ["men", "female", "kids", "dryclean"],
       required: true,
       index: true,
     },

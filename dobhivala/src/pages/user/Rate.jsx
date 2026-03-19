@@ -128,6 +128,7 @@ const RatePage = ({
           <div className="divide-y border rounded-xl overflow-hidden">
             {rateItems.map((item, index) => {
               const qty = item.service ? getSelectedQty(item.service.id) : 0;
+              const displayPrice = item.service?.price ?? item.price;
 
               return (
                 <div
@@ -152,7 +153,7 @@ const RatePage = ({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                    <span className="min-w-16 text-[#0284c7] font-bold">{item.price}</span>
+                    <span className="min-w-16 text-[#0284c7] font-bold">Rs {displayPrice}</span>
 
                     <div className="flex items-center gap-2 rounded-full border border-sky-100 bg-sky-50 px-2 py-1">
                       <button

@@ -55,7 +55,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, onLogout, setSidebarOpen }) => 
       </div>
 
       {/* Navigation Tabs */}
-      <nav className="flex-1 px-3 space-y-2 overflow-hidden">
+      <nav className="flex-1 px-3 space-y-2 overflow-y-auto pr-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

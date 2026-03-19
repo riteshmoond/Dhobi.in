@@ -1,7 +1,15 @@
 const { z } = require("zod");
 
-const categoryEnum = z.enum(["men", "female", "kids"]);
+const categoryEnum = z.enum(["men", "female", "kids", "dryclean"]);
 const paymentMethodEnum = z.enum(["cod", "upi", "card", "netbanking"]);
+
+const optionPricesSchema = z
+  .object({
+    iron: z.coerce.number().min(0).optional(),
+    wash: z.coerce.number().min(0).optional(),
+    dryclean: z.coerce.number().min(0).optional(),
+  })
+  .optional();
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
@@ -26,6 +34,7 @@ const createServiceSchema = z.object({
   popular: z.boolean().optional(),
   category: categoryEnum,
   active: z.boolean().optional(),
+  optionPrices: optionPricesSchema,
 });
 
 const replaceServicesSchema = z.object({
@@ -40,6 +49,7 @@ const replaceServicesSchema = z.object({
       popular: z.boolean().optional(),
       category: categoryEnum,
       active: z.boolean().optional(),
+      optionPrices: optionPricesSchema,
     })
   ),
 });
@@ -53,6 +63,7 @@ const updateServiceSchema = z
     popular: z.boolean().optional(),
     category: categoryEnum.optional(),
     active: z.boolean().optional(),
+    optionPrices: optionPricesSchema,
   })
   .refine((obj) => Object.keys(obj).length > 0, {
     message: "At least one field is required",

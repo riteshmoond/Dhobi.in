@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { normalizeOrdersTracking } from "../../lib/orderTracking";
 import { defaultAdminSettings, normalizeSettings } from "../../lib/adminSettings";
+import { withResolvedOptionPrices } from "../../lib/servicesStore";
 import {
   adminUpdateOrderApi,
   createServiceApi,
@@ -42,6 +43,11 @@ const AdminPanel = () => {
   const [customers, setCustomers] = useState([]);
   const [settings, setSettings] = useState(defaultAdminSettings);
 
+  const hydrateServices = (items, nextSettings = settings) =>
+    (Array.isArray(items) ? items : []).map((service) =>
+      withResolvedOptionPrices(service, nextSettings)
+    );
+
   const loadOrders = async () => {
     const result = await getAdminOrdersApi();
     if (result.success && Array.isArray(result.data?.orders)) {
@@ -73,7 +79,7 @@ const AdminPanel = () => {
   const loadServices = async () => {
     const result = await getServicesApi();
     if (result.success && Array.isArray(result.data?.services)) {
-      setServices(result.data.services);
+      setServices(hydrateServices(result.data.services));
       return;
     }
     setServices([]);
@@ -152,7 +158,7 @@ const AdminPanel = () => {
       alert(result.message || "Failed to save services");
       return false;
     }
-    setServices(result.data?.services || nextServices);
+    setServices(hydrateServices(result.data?.services || nextServices));
     window.dispatchEvent(new Event("dobhivala:services:updated"));
     return true;
   };
@@ -163,7 +169,7 @@ const AdminPanel = () => {
       alert(result.message || "Failed to add service");
       return null;
     }
-    setServices((prev) => [result.data.service, ...prev]);
+    setServices((prev) => [withResolvedOptionPrices(result.data.service, settings), ...prev]);
     window.dispatchEvent(new Event("dobhivala:services:updated"));
     return result.data.service;
   };
@@ -185,7 +191,9 @@ const AdminPanel = () => {
       alert(result.message || "Failed to save settings");
       return false;
     }
-    setSettings(normalizeSettings(result.data?.settings || nextSettings));
+    const normalizedSettings = normalizeSettings(result.data?.settings || nextSettings);
+    setSettings(normalizedSettings);
+    setServices((prev) => hydrateServices(prev, normalizedSettings));
     window.dispatchEvent(new Event("dobhivala:settings:updated"));
     return true;
   };

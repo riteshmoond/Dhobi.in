@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { slides, dryCleanPlans } from "./Homeservices";
+import { getVariantServiceId, getServiceVariantDefinitions } from "../../lib/servicesStore";
+import { defaultAdminSettings } from "../../lib/adminSettings";
 
 export default function Home({
     cart,
     addToCart,
     removeFromCart,
+    allServices = [],
+    adminSettings = defaultAdminSettings,
     servicesByCategory = { men: [], female: [], kids: [] },
     categoryVisibility = { men: true, female: true, kids: true },
 }) {
@@ -34,6 +38,53 @@ export default function Home({
     const kidsCards = servicesByCategory.kids.slice(0, 4);
 
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [selectedQtyById, setSelectedQtyById] = useState({});
+    const serviceVariantDefinitions = getServiceVariantDefinitions(adminSettings);
+
+    const getVariantService = (itemId, variantKey) =>
+        allServices.find((service) => String(service.id) === getVariantServiceId(itemId, variantKey));
+
+    const getDryCleanService = (serviceId) =>
+        allServices.find((service) => String(service.id) === String(serviceId));
+
+    const getPlanStartingPrice = (plan) => {
+        const prices = (plan.rateList || [])
+            .map((item) => Number(getDryCleanService(item.serviceId)?.price))
+            .filter((price) => Number.isFinite(price) && price > 0);
+
+        if (prices.length === 0) return plan.price;
+        return `Rs ${Math.min(...prices)}`;
+    };
+
+    const getSelectedQty = (itemId) => selectedQtyById[itemId] || 0;
+
+    const increaseSelectedQty = (itemId) => {
+        setSelectedQtyById((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    };
+
+    const decreaseSelectedQty = (itemId) => {
+        setSelectedQtyById((prev) => {
+            const current = prev[itemId] || 0;
+            if (current <= 0) return prev;
+            const next = { ...prev };
+            if (current === 1) delete next[itemId];
+            else next[itemId] = current - 1;
+            return next;
+        });
+    };
+
+    const addSelectedToCart = (itemId) => {
+        const qty = getSelectedQty(itemId);
+        if (qty <= 0) return;
+        for (let i = 0; i < qty; i += 1) {
+            addToCart(itemId);
+        }
+        setSelectedQtyById((prev) => {
+            const next = { ...prev };
+            delete next[itemId];
+            return next;
+        });
+    };
 
     return (
         <div className="w-full flex flex-col items-center gap-20 py-4 bg-gradient-to-b from-[#e8f9ff] to-[#f7fbff]">
@@ -121,6 +172,10 @@ export default function Home({
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-6">
                             {dryCleanPlans.map((plan) => (
                                 <article key={plan.id} className="bg-white rounded-2xl p-5 shadow-sm border hover:shadow-lg transition">
+                                    {(() => {
+                                        const startingPrice = getPlanStartingPrice(plan);
+                                        return (
+                                            <>
                                     <div className="flex items-start gap-4">
                                         <img src={plan.img} alt={plan.title} className="w-20 h-20 object-cover rounded-lg" />
                                         <div className="flex-1">
@@ -128,8 +183,8 @@ export default function Home({
                                             <p className="text-sm text-slate-600 mt-1 hidden md:block">{plan.description}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-2xl font-extrabold text-[#0ea5c9]">{plan.price}</p>
-                                            <p className="text-xs text-slate-500 mt-1">{plan.subtitle}</p>
+                                            <p className="text-2xl font-extrabold text-[#0ea5c9]">{startingPrice}</p>
+                                            <p className="text-xs text-slate-500 mt-1">starting price</p>
                                         </div>
                                     </div>
 
@@ -152,6 +207,9 @@ export default function Home({
                                         </Button>
 
                                     </div>
+                                            </>
+                                        );
+                                    })()}
                                 </article>
                             ))}
                         </div>
@@ -191,7 +249,7 @@ export default function Home({
 
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
                             {section.data.map((item) => {
-                                const qty = cart?.[String(item.id)] || 0;
+                                const qty = getSelectedQty(item.id);
                                 return (
                                     <MotionArticle
                                         key={item.id}
@@ -238,7 +296,7 @@ export default function Home({
                                                     size="icon"
                                                     className="h-8 w-8 rounded-full bg-slate-50"
                                                     disabled={qty === 0}
-                                                    onClick={() => removeFromCart(item.id)}
+                                                    onClick={() => decreaseSelectedQty(item.id)}
                                                 >
                                                     <Minus className="w-4 h-4 text-[#045f9a]" />
                                                 </Button>
@@ -250,7 +308,7 @@ export default function Home({
                                                 <Button
                                                     size="icon"
                                                     className="h-8 w-8 rounded-full bg-[#0284c7] text-white shadow"
-                                                    onClick={() => addToCart(item.id)}
+                                                    onClick={() => increaseSelectedQty(item.id)}
                                                 >
                                                     <Plus className="w-4 h-4" />
                                                 </Button>
@@ -272,41 +330,25 @@ export default function Home({
   {openDropdown === item.id &&  (
     <div className="absolute z-20 mt-2 w-full bg-white border rounded-xl shadow-lg overflow-hidden">
       
-      {/* Iron */}
-      <button
-        onClick={() => {
-          addToCart(item.id, "iron");
-          navigate("/addtocard");
-          setOpenDropdown(null);
-        }}
-        className="w-full px-4 py-2 text-sm text-left hover:bg-[#0284c7] hover:text-white transition"
-      >
-        🔥 Iron
-      </button>
+      {serviceVariantDefinitions.map((variant) => {
+        const variantService = getVariantService(item.id, variant.key);
+        if (!variantService) return null;
 
-      {/* Dry Cleaning */}
-      <button
-        onClick={() => {
-          addToCart(item.id, "dry-cleaning");
-          navigate("/addtocard");
-          setOpenDropdown(null);
-        }}
-        className="w-full px-4 py-2 text-sm text-left hover:bg-[#0284c7] hover:text-white transition"
-      >
-        🧼 Dry Cleaning
-      </button>
-
-      {/* Wash & Iron */}
-      <button
-        onClick={() => {
-          addToCart(item.id, "wash-iron");
-          navigate("/addtocard");
-          setOpenDropdown(null);
-        }}
-        className="w-full px-4 py-2 text-sm text-left hover:bg-[#0284c7] hover:text-white transition"
-      >
-        👕 Wash & Iron
-      </button>
+        return (
+          <button
+            key={variant.key}
+            onClick={() => {
+              addToCart(variantService.id);
+              navigate("/addtocard");
+              setOpenDropdown(null);
+            }}
+            className="flex w-full items-center justify-between px-4 py-2 text-sm text-left hover:bg-[#0284c7] hover:text-white transition"
+          >
+            <span>{variant.label}</span>
+            <span>₹{variantService.price}</span>
+          </button>
+        );
+      })}
 
     </div>
   )}
@@ -314,10 +356,11 @@ export default function Home({
 
 
                                                 <button
-                                                    onClick={() => addToCart(item.id)}
+                                                    onClick={() => addSelectedToCart(item.id)}
+                                                    disabled={qty === 0}
                                                     className="px-4 py-2 border border-[#0284c7] text-[#0284c7] rounded-full text-sm hover:bg-[#0284c7] hover:text-white transition"
                                                 >
-                                                    Add to Cart
+                                                    Add to Cart {qty > 0 ? `(${qty})` : ""}
                                                 </button>
                                             </div>
                                         </div>

@@ -10,6 +10,11 @@ const mapService = (service) => ({
   price: service.price,
   img: service.img,
   popular: Boolean(service.popular),
+  optionPrices: {
+    iron: Number(service.optionPrices?.iron) || 0,
+    wash: Number(service.optionPrices?.wash) || 0,
+    dryclean: Number(service.optionPrices?.dryclean) || 0,
+  },
   category: service.category,
   active: Boolean(service.active),
   createdAt: service.createdAt,
@@ -32,7 +37,7 @@ const getServices = async (req, res) => {
     const category = String(req.query.category || "").trim();
     const services = DEFAULT_SERVICES.filter((service) => {
       if (service.active === false) return false;
-      if (!["men", "female", "kids"].includes(category)) return true;
+      if (!["men", "female", "kids", "dryclean"].includes(category)) return true;
       return service.category === category;
     });
 
@@ -47,7 +52,7 @@ const getServices = async (req, res) => {
 
   const category = String(req.query.category || "").trim();
   const filter = { active: true };
-  if (["men", "female", "kids"].includes(category)) {
+  if (["men", "female", "kids", "dryclean"].includes(category)) {
     filter.category = category;
   }
 
@@ -72,11 +77,18 @@ const createService = async (req, res) => {
     return res.status(400).json(errorResponse("Service name is required"));
   }
 
-  if (!["men", "female", "kids"].includes(category)) {
+  if (!["men", "female", "kids", "dryclean"].includes(category)) {
     return res.status(400).json(errorResponse("Invalid category"));
   }
 
-  const prefix = category === "female" ? "F" : category === "kids" ? "K" : "M";
+  const prefix =
+    category === "female"
+      ? "F"
+      : category === "kids"
+        ? "K"
+        : category === "dryclean"
+          ? "D"
+          : "M";
   const code = `${prefix}${Date.now()}`;
 
   const service = await Service.create({
@@ -86,6 +98,11 @@ const createService = async (req, res) => {
     price: Number(req.body?.price) || 0,
     img: String(req.body?.img || "").trim(),
     popular: Boolean(req.body?.popular),
+    optionPrices: {
+      iron: Number(req.body?.optionPrices?.iron) || 0,
+      wash: Number(req.body?.optionPrices?.wash) || 0,
+      dryclean: Number(req.body?.optionPrices?.dryclean) || 0,
+    },
     category,
     active: req.body?.active !== false,
   });
@@ -106,13 +123,20 @@ const replaceServices = async (req, res) => {
   const normalized = incoming
     .map((service, idx) => {
       const category = String(service?.category || "").trim();
-      if (!["men", "female", "kids"].includes(category)) return null;
+      if (!["men", "female", "kids", "dryclean"].includes(category)) return null;
 
       const name = String(service?.name || "").trim();
       if (!name) return null;
 
       const code = String(service?.id || service?.code || "").trim();
-      const prefix = category === "female" ? "F" : category === "kids" ? "K" : "M";
+      const prefix =
+        category === "female"
+          ? "F"
+          : category === "kids"
+            ? "K"
+            : category === "dryclean"
+              ? "D"
+              : "M";
 
       return {
         code: code || `${prefix}${Date.now()}${idx}`,
@@ -121,6 +145,11 @@ const replaceServices = async (req, res) => {
         price: Number(service?.price) || 0,
         img: String(service?.img || "").trim(),
         popular: Boolean(service?.popular),
+        optionPrices: {
+          iron: Number(service?.optionPrices?.iron) || 0,
+          wash: Number(service?.optionPrices?.wash) || 0,
+          dryclean: Number(service?.optionPrices?.dryclean) || 0,
+        },
         category,
         active: service?.active !== false,
       };
@@ -159,10 +188,17 @@ const updateService = async (req, res) => {
   if (req.body?.img !== undefined) service.img = String(req.body.img || "").trim();
   if (req.body?.popular !== undefined) service.popular = Boolean(req.body.popular);
   if (req.body?.active !== undefined) service.active = Boolean(req.body.active);
+  if (req.body?.optionPrices !== undefined) {
+    service.optionPrices = {
+      iron: Number(req.body?.optionPrices?.iron) || 0,
+      wash: Number(req.body?.optionPrices?.wash) || 0,
+      dryclean: Number(req.body?.optionPrices?.dryclean) || 0,
+    };
+  }
 
   if (req.body?.category !== undefined) {
     const nextCategory = String(req.body.category || "").trim();
-    if (!["men", "female", "kids"].includes(nextCategory)) {
+    if (!["men", "female", "kids", "dryclean"].includes(nextCategory)) {
       return res.status(400).json(errorResponse("Invalid category"));
     }
     service.category = nextCategory;

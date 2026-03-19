@@ -62,8 +62,8 @@ const App = () => {
   const { isUserLoggedIn, isAdminLoggedIn, loading } = useAuth();
   const location = useLocation();
   const [cart, setCart] = useState({});
-  const [allServices, setAllServices] = useState(() => loadServicesFromStorage());
   const [adminSettings, setAdminSettings] = useState(defaultAdminSettings);
+  const [allServices, setAllServices] = useState(() => loadServicesFromStorage(defaultAdminSettings));
 
   const hideChromeOnPaths = ["/auth", "/login", "/admin"];
   const shouldShowLayoutChrome =
@@ -77,16 +77,17 @@ const App = () => {
         getSettingsApi(),
       ]);
 
-      if (servicesResult.success && Array.isArray(servicesResult.data?.services)) {
-        setAllServices(mergeServicesWithDefaults(servicesResult.data.services));
-      } else {
-        setAllServices(loadServicesFromStorage());
-      }
+      const resolvedSettings =
+        settingsResult.success && settingsResult.data?.settings
+          ? normalizeSettings(settingsResult.data.settings)
+          : loadAdminSettings();
 
-      if (settingsResult.success && settingsResult.data?.settings) {
-        setAdminSettings(normalizeSettings(settingsResult.data.settings));
+      setAdminSettings(resolvedSettings);
+
+      if (servicesResult.success && Array.isArray(servicesResult.data?.services)) {
+        setAllServices(mergeServicesWithDefaults(servicesResult.data.services, resolvedSettings));
       } else {
-        setAdminSettings(loadAdminSettings());
+        setAllServices(loadServicesFromStorage(resolvedSettings));
       }
     };
 
@@ -125,18 +126,22 @@ const App = () => {
     const handleServicesUpdate = async () => {
       const result = await getServicesApi();
       if (result.success && Array.isArray(result.data?.services)) {
-        setAllServices(mergeServicesWithDefaults(result.data.services));
+        setAllServices(mergeServicesWithDefaults(result.data.services, adminSettings));
         return;
       }
-      setAllServices(loadServicesFromStorage());
+      setAllServices(loadServicesFromStorage(adminSettings));
     };
     const handleSettingsUpdate = async () => {
       const result = await getSettingsApi();
       if (result.success && result.data?.settings) {
-        setAdminSettings(normalizeSettings(result.data.settings));
+        const nextSettings = normalizeSettings(result.data.settings);
+        setAdminSettings(nextSettings);
+        setAllServices((prev) => mergeServicesWithDefaults(prev, nextSettings));
         return;
       }
-      setAdminSettings(loadAdminSettings());
+      const nextSettings = loadAdminSettings();
+      setAdminSettings(nextSettings);
+      setAllServices((prev) => mergeServicesWithDefaults(prev, nextSettings));
     };
     window.addEventListener("dobhivala:cart:clear", handleClearCart);
     window.addEventListener("dobhivala:services:updated", handleServicesUpdate);
@@ -146,7 +151,7 @@ const App = () => {
       window.removeEventListener("dobhivala:services:updated", handleServicesUpdate);
       window.removeEventListener("dobhivala:settings:updated", handleSettingsUpdate);
     };
-  }, []);
+  }, [adminSettings]);
 
   const addToCart = (id) => {
     const itemExists = allServices.some((service) => String(service.id) === String(id));
@@ -215,6 +220,8 @@ const App = () => {
                 cart={cart}
                 addToCart={addToCart}
                 removeFromCart={removeFromCart}
+                allServices={allServices}
+                adminSettings={adminSettings}
                 servicesByCategory={servicesByCategory}
                 categoryVisibility={adminSettings.categoryVisibility}
               />
@@ -244,6 +251,8 @@ const App = () => {
                     ? servicesByCategory.men
                     : []
                 }
+                allServices={allServices}
+                adminSettings={adminSettings}
                 cart={cart}
                 addToCart={addToCart}
                 removeFromCart={removeFromCart}
@@ -262,6 +271,8 @@ const App = () => {
                     ? servicesByCategory.female
                     : []
                 }
+                allServices={allServices}
+                adminSettings={adminSettings}
                 cart={cart}
                 addToCart={addToCart}
                 removeFromCart={removeFromCart}
@@ -280,6 +291,8 @@ const App = () => {
                     ? servicesByCategory.kids
                     : []
                 }
+                allServices={allServices}
+                adminSettings={adminSettings}
                 cart={cart}
                 addToCart={addToCart}
                 removeFromCart={removeFromCart}

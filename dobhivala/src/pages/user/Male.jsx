@@ -9,9 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Plus, Minus, Star } from "lucide-react";
 import { menServices } from "./Menservices";
 import { useNavigate } from "react-router-dom";
+import { getVariantServiceId, getServiceVariantDefinitions } from "../../lib/servicesStore";
+import { defaultAdminSettings } from "../../lib/adminSettings";
 
 const Male = ({
   services = menServices,
+  allServices = [],
+  adminSettings = defaultAdminSettings,
   addToCart = () => console.warn("addToCart function not provided"),
   totalItems = 0,
   subtotal = 0,
@@ -19,6 +23,8 @@ const Male = ({
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedQtyById, setSelectedQtyById] = useState({});
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const serviceVariantDefinitions = getServiceVariantDefinitions(adminSettings);
 
   const filteredItems = services.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
@@ -53,6 +59,9 @@ const Male = ({
       return next;
     });
   };
+
+  const getVariantService = (itemId, variantKey) =>
+    allServices.find((service) => String(service.id) === getVariantServiceId(itemId, variantKey));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#e3f6ff] via-[#f7fbff] to-[#cfe9ff] pt-20 text-gray-800">
@@ -150,7 +159,41 @@ const Male = ({
                   </div>
 
                   {/* Buttons */}
-                  <div className="flex flex-col sm:flex-row justify-center gap-3">
+                  <div className="flex flex-col justify-center gap-3">
+                    <div className="relative">
+                      <Button
+                        className="bg-gradient-to-r from-[#009dff] to-[#007acc] text-white rounded-full px-4 py-2 text-sm w-full"
+                        onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}
+                      >
+                        Wash Options
+                      </Button>
+
+                      {openDropdown === item.id && (
+                        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border bg-white shadow-lg">
+                          {serviceVariantDefinitions.map((variant) => {
+                            const variantService = getVariantService(item.id, variant.key);
+                            if (!variantService) return null;
+
+                            return (
+                              <button
+                                key={variant.key}
+                                onClick={() => {
+                                  addToCart(variantService.id);
+                                  navigate("/addtocard");
+                                  setOpenDropdown(null);
+                                }}
+                                className="flex w-full items-center justify-between px-4 py-2 text-sm text-left hover:bg-[#009dff] hover:text-white transition"
+                              >
+                                <span>{variant.label}</span>
+                                <span>₹{variantService.price}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row justify-center gap-3">
                     <Button
                       className="bg-gradient-to-r from-[#009dff] to-[#007acc] 
                       text-white rounded-full px-4 py-2 text-sm w-full sm:w-auto"
@@ -168,6 +211,7 @@ const Male = ({
                     >
                       Add to Cart {qty > 0 ? `(${qty})` : ""}
                     </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
