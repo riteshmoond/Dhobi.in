@@ -276,18 +276,8 @@ export default function Home({
                                                 </span>
                                             </div>
 
-                                            <p className="text-sm text-slate-500 mt-2">
-                                                ₹{item.price} • {item.unit}
-                                            </p>
 
-                                            <div className="mt-4 flex items-center justify-center gap-3">
-                                                <p className="text-xl font-bold text-[#0ea5c9]">
-                                                    ₹{item.price}
-                                                </p>
-                                                <p className="text-xs text-slate-400 line-through">
-                                                    ₹{item.price + 30}
-                                                </p>
-                                            </div>
+                                                {/* ...existing code... */}
 
                                             {/* qty controls */}
                                             <div className="flex items-center justify-center gap-3 mt-4">

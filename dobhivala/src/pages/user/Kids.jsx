@@ -129,19 +129,9 @@ const Kids = ({
                     <span>{item.rating || "4.8"}</span>
                   </div>
 
-                  <p className="text-gray-700 text-xs sm:text-sm mb-2">
-                    ₹{item.price} • {item.unit}
-                  </p>
 
                   {/* Price */}
-                  <div className="flex justify-center items-center gap-2 mb-3">
-                    <p className="text-lg font-semibold text-[#009dff]">
-                      ₹{item.price}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-400 line-through">
-                      ₹{item.price + 30}
-                    </p>
-                  </div>
+                    {/* ...existing code... */}
 
                   {/* Quantity */}
                   <div className="flex justify-center items-center gap-3 mb-4">
