@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -26,9 +26,18 @@ const Kids = ({
   const [openDropdown, setOpenDropdown] = useState(null);
   const serviceVariantDefinitions = getServiceVariantDefinitions(adminSettings);
 
-  const filteredItems = services.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredItems = useMemo(() => {
+    const seen = new Set();
+
+    return services.filter((item) => {
+      if (!item?.name?.toLowerCase().includes(search.toLowerCase())) return false;
+
+      const dedupeKey = String(item.variantOf || item.name).trim().toLowerCase();
+      if (seen.has(dedupeKey)) return false;
+      seen.add(dedupeKey);
+      return true;
+    });
+  }, [search, services]);
 
   const getSelectedQty = (itemId) => selectedQtyById[itemId] || 0;
 
@@ -70,7 +79,7 @@ const Kids = ({
         {/* Header */}
         <div className="text-center px-2">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#009dff] drop-shadow-lg">
-            Women’s Laundry Services
+            Kids Laundry Services
           </h2>
           <p className="text-sm text-gray-600 mt-2">
             Premium care for your delicate wear 👗✨
@@ -81,7 +90,7 @@ const Kids = ({
         <div className="mt-6 px-2 flex justify-center">
           <input
             type="text"
-            placeholder="Search Women’s Clothing..."
+            placeholder="Search Kids Clothing..."
             className="border rounded-full px-4 py-2 w-full max-w-md text-sm sm:text-base bg-white border-[#87cefa] outline-none shadow-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

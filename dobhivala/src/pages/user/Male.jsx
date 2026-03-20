@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -26,9 +26,18 @@ const Male = ({
   const [openDropdown, setOpenDropdown] = useState(null);
   const serviceVariantDefinitions = getServiceVariantDefinitions(adminSettings);
 
-  const filteredItems = services.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredItems = useMemo(() => {
+    const seen = new Set();
+
+    return services.filter((item) => {
+      if (!item?.name?.toLowerCase().includes(search.toLowerCase())) return false;
+
+      const dedupeKey = String(item.variantOf || item.name).trim().toLowerCase();
+      if (seen.has(dedupeKey)) return false;
+      seen.add(dedupeKey);
+      return true;
+    });
+  }, [search, services]);
 
   const getSelectedQty = (itemId) => selectedQtyById[itemId] || 0;
 
